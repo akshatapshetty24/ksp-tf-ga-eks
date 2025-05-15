@@ -150,3 +150,22 @@ resource "aws_eks_node_group" "example_nodes" {
     aws_iam_role_policy_attachment.node_AmazonEKS_CNI_Policy
   ]
 }
+
+# ECR
+resource "aws_ecr_repository" "app_repo" {
+  name                 = "ksp-ecr-app-repository"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  tags = {
+    Name = "ksp-ecr-app-repository"
+  }
+}
+
+output "ecr_repository_url" {
+  value = aws_ecr_repository.app_repo.repository_url
+}
+
