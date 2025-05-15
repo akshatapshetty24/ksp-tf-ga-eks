@@ -25,10 +25,8 @@ jobs:
 
       - name: 📦 Terraform Init
         run: |
-          cd terraform
           terraform init
 
       - name: ☠️ Terraform Destroy
         run: |
-          cd terraform
           terraform destroy -auto-approve
