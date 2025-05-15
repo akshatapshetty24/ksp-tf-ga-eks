@@ -43,7 +43,7 @@ jobs:
           ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
           REPOSITORY_URI=$ACCOUNT_ID.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY
 
-          sed "s|<AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/$ECR_REPOSITORY:latest|$REPOSITORY_URI:$IMAGE_TAG|g" deployment.yaml | kubectl apply -f -
+          sed "s|<IMAGE_URI>|$REPOSITORY_URI:$IMAGE_TAG|g" k8s/deployment.yaml | kubectl apply -f -
           
       - name: ✅ Check Services and Pods
         run: |
