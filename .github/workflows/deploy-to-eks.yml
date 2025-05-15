@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
 
 env:
-  ECR_REPOSITORY: my-app-repository
+  ECR_REPOSITORY: ksp-ecr-app-repository
   IMAGE_TAG: latest
-  CLUSTER_NAME: my-github-eks-cluster
+  CLUSTER_NAME: ksp-ga-eks-cluster
 
 jobs:
   deploy:
