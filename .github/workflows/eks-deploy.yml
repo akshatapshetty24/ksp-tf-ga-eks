@@ -22,10 +22,10 @@ jobs:
         aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Terraform Init
-      run: terraform init
+      run: ./terrraform/terraform init
 
     - name: Terraform Apply
       run: |
-        terraform apply -auto-approve \
+        ./terraform/terraform apply -auto-approve \
           -var "aws_region=${{ secrets.AWS_REGION }}" \
           -var "cluster_name=ksp-ga-eks-cluster" 
