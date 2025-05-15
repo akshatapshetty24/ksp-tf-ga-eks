@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: express-app-container
-          image: 904233102697.dkr.ecr.ap-south-1.amazonaws.com/ksp-ecr-app-repository:latest
+          image: <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com
           ports:
             - containerPort: 3000
           env:
