@@ -1,0 +1,51 @@
+name: 🚀 Build, Push & Deploy to EKS
+
+on:
+  workflow_dispatch:
+
+env:
+  ECR_REPOSITORY: my-app-repository
+  IMAGE_TAG: latest
+  CLUSTER_NAME: my-github-eks-cluster
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔐 Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: 📦 Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: 🐳 Build, tag, and push Docker image to ECR
+        run: |
+          ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
+          REPOSITORY_URI=$ACCOUNT_ID.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY
+          
+          docker build -t $REPOSITORY_URI:$IMAGE_TAG .
+          docker push $REPOSITORY_URI:$IMAGE_TAG
+
+      - name: ⚙️ Update Kubeconfig for EKS
+        run: |
+          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name $CLUSTER_NAME
+
+      - name: 📦 Deploy to EKS
+        run: |
+          ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
+          REPOSITORY_URI=$ACCOUNT_ID.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY
+
+          sed "s|<AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/$ECR_REPOSITORY:latest|$REPOSITORY_URI:$IMAGE_TAG|g" deployment.yaml | kubectl apply -f -
+          
+      - name: ✅ Check Services and Pods
+        run: |
+          kubectl get svc
+          kubectl get pods
